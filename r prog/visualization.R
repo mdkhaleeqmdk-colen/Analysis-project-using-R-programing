@@ -1,0 +1,64 @@
+library(tidyverse)
+pdf("visualization.pdf")
+data <- read.csv("diabetes.csv")
+datacopy <- data
+#scatterplot
+datacopy$Glucose[is.na(datacopy$Glucose)] <-
+  ceiling(mean(datacopy$Glucose, na.rm = TRUE))
+
+x <- datacopy$Glucose
+y <-datacopy$BloodPressure
+plot(x
+     , y
+     , col="black"
+     , xlab = "Glucose levels in women in milligrams per deciliter (mg/dL)"  #x-axis label
+     , ylab = "Blood pressure in millimetres of mercury (mmHg)"            #y-axis label
+     , cex.lab = 1 #axis horizontal text
+     , main = "Blood pressure Vs Glucose levels in women" #chart title
+     , pch = 1 #point shape
+     , frame = T #surround chart with a frame
+     , xlim = c(-5,250)
+     , xaxs = "i"
+     , ylim = c(-5,250)
+     , yaxs = "i"
+)
+
+
+abline(lm(y ~ x),col = "blue")     # draw the linear model as a blue line
+legend ("topleft", legend = c("Linear model"), lwd = 1, lty = c(1), col = c("blue"))
+
+
+############Histogram############
+
+h<- hist(y
+         , plot = FALSE
+         , breaks = seq(0, 500, by = 50)
+)
+plot(h
+     , xaxt = "n"
+     , xlab = "Blood Pressure in women in millimetres of mercury(mmHg)"    #X-axis label
+     , ylab = "Frequency"                  #Y-axis label
+     , las = 1
+     , main = "Blood Pressure frequency"   #chart title
+     , col = "orange"
+     , ylim = c(0,2000)
+     , xlim = c(0,200)
+)
+axis(1
+     , padj = 0
+     , at =seq(0,500, by=50)
+     , las = 1
+)
+
+mn<- mean(y)                    #mean of the data
+stdD <- sd(y)                   #standard deviation of the data
+x <- seq (0,500,1)
+y1 <- dnorm(x, mean=mn, sd=stdD)
+y1 <- y1 * diff(h$mids[1:2]) * length(y);
+lines(x, y1, col="blue")
+text(h$mids, h$counts, labels = h$counts, adj= c(0.5, -0.5))
+legend("topright", legend = c("Normal Curve"), lwd = 1, lty = c(1), col= c("blue"))
+dev.off()
+
+
+
